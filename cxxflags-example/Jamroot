@@ -1,0 +1,8 @@
+project
+   : requirements
+
+      <cxxflags>-DSHOULD_BE_CXXFLAGS_ONLY
+
+   ;
+
+exe example : example.c ;

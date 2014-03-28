@@ -1,0 +1,36 @@
+boost_BUILD_PATH=~/opt/local/src/boost/boost.git/tools/build ~/opt/local/src/boost/boost.git/tools/build/src/engine/bin.linuxx86_64/b2 toolset=gcc toolset=clang -a -n
+...found 11 targets...
+...updating 8 targets...
+common.mkdir bin/gcc-4.8.2
+
+        mkdir -p "bin/gcc-4.8.2"
+
+common.mkdir bin/gcc-4.8.2/debug
+
+        mkdir -p "bin/gcc-4.8.2/debug"
+
+gcc.compile.c bin/gcc-4.8.2/debug/example.o
+
+    "g++" -x c -O0 -fno-inline -Wall -g -fPIC     -c -o "bin/gcc-4.8.2/debug/example.o" "example.c"
+
+gcc.link bin/gcc-4.8.2/debug/example
+
+    "g++"    -o "bin/gcc-4.8.2/debug/example" -Wl,--start-group "bin/gcc-4.8.2/debug/example.o"  -Wl,-Bstatic  -Wl,-Bdynamic  -Wl,--end-group -g
+
+common.mkdir bin/clang-linux-3.3
+
+        mkdir -p "bin/clang-linux-3.3"
+
+common.mkdir bin/clang-linux-3.3/debug
+
+        mkdir -p "bin/clang-linux-3.3/debug"
+
+clang-linux.compile.c.without-pth bin/clang-linux-3.3/debug/example.o
+
+  "clang++" -c -x c -O0 -g -fno-inline -Wall -g -fPIC    -c -o "bin/clang-linux-3.3/debug/example.o" "example.c"
+
+clang-linux.link bin/clang-linux-3.3/debug/example
+
+  "clang++"    -o "bin/clang-linux-3.3/debug/example" "bin/clang-linux-3.3/debug/example.o"    -g
+
+...updated 8 targets...

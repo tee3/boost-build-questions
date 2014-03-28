@@ -1,0 +1,43 @@
+BOOST_BUILD_PATH=~/opt/local/src/boost/boost.git/tools/build ~/opt/local/src/boost/boost.git/tools/build/src/engine/bin.macosxx86_64/b2 toolset=darwin toolset=clang -n -a
+...found 11 targets...
+...updating 9 targets...
+common.mkdir bin
+
+        mkdir -p "bin"
+
+common.mkdir bin/darwin-4.2.1
+
+        mkdir -p "bin/darwin-4.2.1"
+
+common.mkdir bin/darwin-4.2.1/debug
+
+        mkdir -p "bin/darwin-4.2.1/debug"
+
+darwin.compile.c bin/darwin-4.2.1/debug/example.o
+
+    "g++" -x c -O0 -fno-inline -Wall -g -dynamic -gdwarf-2 -fexceptions -fPIC     -c -o "bin/darwin-4.2.1/debug/example.o" "example.c"
+
+darwin.link bin/darwin-4.2.1/debug/example
+
+    "g++"  -o "bin/darwin-4.2.1/debug/example" "bin/darwin-4.2.1/debug/example.o"       -g
+
+
+common.mkdir bin/clang-darwin-4.2.1
+
+        mkdir -p "bin/clang-darwin-4.2.1"
+
+common.mkdir bin/clang-darwin-4.2.1/debug
+
+        mkdir -p "bin/clang-darwin-4.2.1/debug"
+
+clang-darwin.compile.c bin/clang-darwin-4.2.1/debug/example.o
+
+    "clang++" -x c -O0 -g -DSHOULD_BE_CXXFLAGS_ONLY -O0 -fno-inline -Wall -g   -c -o "bin/clang-darwin-4.2.1/debug/example.o" "example.c"
+
+clang-darwin.link bin/clang-darwin-4.2.1/debug/example
+
+    "clang++"   -o "bin/clang-darwin-4.2.1/debug/example" "bin/clang-darwin-4.2.1/debug/example.o"    -g
+
+...updated 9 targets...
+
+Compilation finished at Fri Mar 28 14:32:24
