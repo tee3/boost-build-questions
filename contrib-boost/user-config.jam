@@ -1,0 +1,6 @@
+import os ;
+import boost ;
+
+constant HOME : [ os.environ HOME ] ;
+
+using boost : git : <root>$(HOME)/opt/local/src/boost/boost.git ;

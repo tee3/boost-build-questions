@@ -1,0 +1,3 @@
+import boost ;
+
+boost.use-project git ;

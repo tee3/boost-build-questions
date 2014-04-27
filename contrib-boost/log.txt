@@ -1,0 +1,16 @@
+BOOST_BUILD_PATH=~/opt/local/src/boost/boost.git/tools/build ~/opt/local/src/boost/boost.git/tools/build/src/engine/bin.macosxx86_64/b2 --user-config=./user-config.jam toolset=darwin-4.9 -j 8 -a
+Performing configuration checks
+
+    - symlinks supported       : yes (cached)
+/Users/tbrown/opt/local/src/boost/boost.git/tools/build/src/build/generators.jam:1102: in ensure-type from module generators
+error: target { link%link.do-link-recursively-accumulators-headers. { libs/accumulators/include/boost. } } has no type
+/Users/tbrown/opt/local/src/boost/boost.git/tools/build/src/build/generators.jam:1359: in generators.construct from module generators
+/Users/tbrown/opt/local/src/boost/boost.git/tools/build/src/build/targets.jam:1532: in construct from module object(typed-target)@1529
+/Users/tbrown/opt/local/src/boost/boost.git/tools/build/src/build/targets.jam:1332: in class@basic-target.generate from module object(typed-target)@1529
+/Users/tbrown/opt/local/src/boost/boost.git/tools/build/src/build/targets.jam:757: in generate-really from module object(main-target)@1534
+/Users/tbrown/opt/local/src/boost/boost.git/tools/build/src/build/targets.jam:729: in class@main-target.generate from module object(main-target)@1534
+/Users/tbrown/opt/local/src/boost/boost.git/tools/build/src/build/targets.jam:272: in class@project-target.generate from module object(project-target)@1528
+/Users/tbrown/opt/local/src/boost/boost.git/tools/build/src/build-system.jam:707: in load from module build-system
+/Users/tbrown/opt/local/src/boost/boost.git/tools/build/src/kernel/modules.jam:289: in import from module modules
+/Users/tbrown/opt/local/src/boost/boost.git/tools/build/src/kernel/bootstrap.jam:139: in boost-build from module
+/Users/tbrown/opt/local/src/boost/boost.git/tools/build/boost-build.jam:8: in module scope from module

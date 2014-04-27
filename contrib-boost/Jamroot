@@ -1,0 +1,8 @@
+exe junk
+   : # sources
+      junk.cpp
+
+      #! @todo this causes build to fail
+      /boost//headers
+
+   ;

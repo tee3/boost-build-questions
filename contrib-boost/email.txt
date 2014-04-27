@@ -1,0 +1,38 @@
+Hi,
+
+I have been using contrib/boost.jam for many years now and it works
+really well.  I'm not sure if there are other people using this or if
+this is a normal use case, but it has worked for us.  The Boost.Build
+file exports Boost C++ Libraries supported by contrib/boost.jam as
+/boost//LIBRARY, which can be referenced from your applications.  It
+allows us to build parts of boost as required by the application with
+different compilers, options, etc. without having to build all the
+parts of boost in advance.
+
+I've run into an issue running with this against the latest 'develop'
+branch of the git repository.  I believe this is due to the fact that
+there is a target associated with contrib/boost.jam called
+/boost//headers, which must be conflicting with the top-level
+'headers' target added to the Boost.Build files for building the Boost
+C++ Libraries.
+
+I have not looked very deeply into the causes of this, this is all
+just a theory.  I did do an experiment where I renamed the 'headers'
+target of the Boost C++ Libraries build files to 'generate-headers'
+and did not resolve the problem, but resulted in /boost//headers not
+being found either.
+
+Questions:
+
+- Has /boost//headers been deprecated/removed from contrib/boost.jam?
+
+- Is contrib/boost.jam still supported?
+
+Please find attached a minimal example that shows the problem and a
+log.txt file that shows the output.  To run, use the user-config.jam
+instead of the user's user-config.jam.
+
+   $ b2 --user-config=./user-config.jam
+
+Thanks,
+Tom
