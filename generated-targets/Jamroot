@@ -1,0 +1,250 @@
+# This is an question in the form of comments in a working Boost.Build
+# Jamroot containing several examples.  You should be able to run each
+# of the targets and observe the behavior I am describing.  It will
+# probably only run on *nix systems since the actions are in Bourne
+# Shell.
+#
+# In working on the goal described below, I did some experimenting
+# with generated files and a lot of things didn't make sense to me.  I
+# thought I would document what they were and maybe someone can
+# explain the fundamental issues behind the behavior (or maybe there
+# is an actual bug).
+#
+# My overall goal is to generate a C++ source or header file
+# describing the version of the software being built driven by the
+# some external state such as the revision control state of the
+# project.  It seemed straightforward to do this (and that proved
+# mostly correct), but I'm having difficulty controlling what gets
+# rebuilt due to the generated file and the Boost.Build target
+# associated with it.
+#
+# The overall approach is to use 'git describe' to get a version
+# string based on the current state of the git repository and generate
+# either a header file or a source file from that to link into the
+# program.
+#
+# Everything works as I expect so far except for the fact that
+# rebuilds are driven by the generated target being out-of-date
+# according to Boost.Build.  This happens because in order to
+# determine if the external state has changed, the generated target is
+# marked as 'always' to force it to run on every build request.  I
+# have an example of the behavior in t5 and t6 below.  I'd be curious
+# what the Boost.Build experts would expect for the behavior in these
+# two cases.
+#
+# By the way, I made a small attempt to do the checking within
+# Boost.Build (which I think is possible), but I felt like it would
+# have the same problem with the target being out of date without a
+# lot of complex work on a new generator to make sure the target is
+# only out of date if the external state has changed.  Unfortunately,
+# my Boost.Build skills are not such that it is obvious to me to write
+# that kind of generator.
+
+import os ;
+
+import errors ;
+
+import generators ;
+import print ;
+
+# EXPERIMENTS
+
+if [ os.name ] = NT
+{
+   errors.user-error "This probably won't run on Windows" ;
+}
+
+# t0
+#
+# This will generate t0.cpp as requested and since there are no
+# dependencies, will only try to generate t0.cpp when it doesn't
+# exist.
+explicit t0 ;
+exe t0
+   : # sources
+      t0.cpp
+   : # requirements
+   : # default-build
+   : # usage-requirements
+   ;
+
+explicit t0.cpp ;
+make t0.cpp : : @always_generate_main ;
+
+# t1
+#
+# This forces t1.cpp to be generated (using the 'always' rule) every
+# time, but t1.cpp is only actually modified when it is created.
+# Unfortunately, even though the file does not change, t1.o and t1 are
+# rebuilt every time.
+#
+# While this kind of makes sense, I was expecting (hoping) that this
+# would use the timestamp on the actual file to drive the recompile of
+# t1.o and relink of t1, not the state of the Boost.Build target since
+# that's how it seems to work for other files.
+explicit t1 ;
+exe t1
+   : # sources
+      t1.cpp
+   : # requirements
+   : # default-build
+   : # usage-requirements
+   ;
+
+explicit t1.cpp ;
+always t1.cpp ;
+make t1.cpp : : @always_generate_main ;
+
+# t2
+#
+# This adds a source for t2 that is a generated header file (t2.hpp)
+# included by t2.cpp.
+#
+# This doesn't work as all as I had expected.  It fails to generate
+# t2.hpp (which is explicitly requested as a source).  Whether or not
+# the include path (which in a build directory) would be correctly
+# updated if the file was created is unknown, but it is not in the
+# current state and I don't think it won't.
+#
+# I understand that the implicit-dependency machinery is what is often
+# recommended here, but I don't see how that is necessary with this
+# kind of use case.
+explicit t2 ;
+exe t2
+   : # sources
+      t2.hpp
+      t2.cpp
+   : # requirements
+   : # default-build
+   : # usage-requirements
+   ;
+
+explicit t2.hpp ;
+make t2.hpp : : @always_change ;
+
+# t3
+#
+# This does the right thing in terms of putting the right include path
+# on the compiler command line.
+#
+# This works in many cases and is probably the intended use case of
+# implicit-dependency.
+#
+# Note that in this example, t3.hpp doesn't depend on anything, so the
+# action is only run when t3.hpp does not yet exist, so this will only
+# work if the file needs to be generated once (or on a change of state
+# of some other file), but not on some other unrelated state.
+#
+# If I could figure out how to force the action to run without forcing
+# the (potentially changing) target to be out of date, this would work
+# for my use case.  Honestly, I'm just not sure why the seemingly
+# obvious solution in t2 does not work.
+explicit t3 ;
+exe t3
+   : # sources
+      t3.cpp
+   : # requirements
+      <implicit-dependency>t3.hpp
+   : # default-build
+   : # usage-requirements
+   ;
+
+explicit t3.hpp ;
+make t3.hpp : : @always_change ;
+
+# t4
+#
+# This is similar to t3, except that the action only changes the file
+# when it is first created.  Obviously, in this case Boost.Build has
+# no idea that the action should be run again, so it isn't.
+explicit t4 ;
+exe t4
+   : # sources
+      t4.cpp
+   : # requirements
+      <implicit-dependency>t4.hpp
+   : # default-build
+   : # usage-requirements
+   ;
+
+explicit t4.hpp ;
+make t4.hpp : : @create_if_missing ;
+
+# t5
+#
+# This seems to work correctly in that it forces the generation of
+# t5.hpp, but does not force a relink of t5 due to t5.hpp always being
+# generated.
+explicit t5 ;
+exe t5
+   : # sources
+      t5.cpp
+   : # requirements
+      <implicit-dependency>t5.hpp
+   : # default-build
+   : # usage-requirements
+   ;
+
+explicit t5.hpp ;
+always t5.hpp ;
+make t5.hpp : : @create_if_missing ;
+
+# t6
+#
+# This does not seem to work correctly.  It is very similar to t5, but
+# t6.cpp actually does depend on t6.hpp.  The part that is unexpected
+# is that even when the tiemstamp / contents of t6.hpp do not change,
+# t6 is rebuilt.
+#
+# This is the behavior that makes my approach fail.
+explicit t6 ;
+exe t6
+   : # sources
+      t6.cpp
+   : # requirements
+      <implicit-dependency>t6.hpp
+   : # default-build
+   : # usage-requirements
+   ;
+
+explicit t6.hpp ;
+always t6.hpp ;
+make t6.hpp : : @create_if_missing ;
+
+# t7
+#
+# This is a suggestion from the mailing list to use the print module.
+explicit t7 ;
+exe t7
+   : # sources
+      t7.cpp
+   ;
+generators.register-standard generate-c++-source-file :  : CPP ;
+rule generate-c++-source-file ( target )
+{
+   s = [ SHELL "echo 'int main() {}'" ] ;
+   print.output $(target) ;
+   print.text $(s) ;
+}
+explicit t7.cpp ;
+generate-c++-source-file t7.cpp ;
+
+# actions to support the above
+
+# this generates a simple main program
+actions always_generate_main
+{
+   echo "int main() {}" > $(<)
+}
+
+# this will always generate the target (update the modification time).
+actions always_change
+{
+   touch $(<)
+}
+
+# this will generate the target only when it is missing
+actions create_if_missing
+{
+   if [ ! -e $(<) ]; then touch $(<) ; fi
+}

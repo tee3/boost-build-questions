@@ -1,0 +1,35 @@
+Hi boost.build experts,
+
+I am trying to generate a C++ source (or header) file containing
+versioning information generated from 'git describe'.  This has become
+necessary as we have moved to git and a branched development model and
+modifying a version file manually is a non-starter (due to conflicts
+on merg) in this development model.  We will be driving the version
+number in binaries by tags in revision control.
+
+This is challenging mainly in that the generated file depends on state
+not known (or knowable) by Boost.Build as opposed to a normal file
+transformation.  This results in either not generating the file when
+it should be (a tag is checked out or a file is edited which do not
+affect the code handling the version number, then the build is run) or
+in rebuilding things when it is not actually necessary (which causes
+all tests to be re-run for example).
+
+I do also understand the 'notfile' rule and I don't think it applies.
+I am actually generating a real file, it just doesn't depend on any
+other sources.
+
+I've created a ticket with a detailed Jamroot and examples to try to
+illustrate what I don't understand.  I'll try to be more brief here.
+
+1. Is there a way to do this easily?  I looked around online and did
+   not see anything that seemed quite right, they all depend on a file
+   not unseen state.
+
+2. Might there be a bug in the implementation or approach to handling
+   generated files / targets?  There are several examples that don't
+   make sense to me, but I could be misunderstanding some more complex
+   issues.
+
+Thanks!
+Tom
