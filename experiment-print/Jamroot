@@ -1,0 +1,5 @@
+import gitversion ;
+
+gitversion.gitversion junk.cpp ;
+
+make junk.cpp : : @gitversion.gitversion ;

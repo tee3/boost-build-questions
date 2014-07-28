@@ -1,0 +1,13 @@
+import generators ;
+import print ;
+
+generators.register-standard gitversion.gitversion : : CPP ;
+
+rule gitversion ( target : sources * : properties * )
+{
+   v = [ SHELL "git -C ~/TrellisWare/cheetah/topx-mac describe --all --long" ] ;
+#   v = "hello" ;
+
+   print.output $(target) ;
+   print.text $(v) : true ;
+}
