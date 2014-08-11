@@ -1,0 +1,7 @@
+exe exp1
+   : # sources
+      exp1.cpp
+   : # requirements
+      <dependency>/boost//headers
+      <library>/boost//thread
+   ;
