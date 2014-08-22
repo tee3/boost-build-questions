@@ -1,0 +1,37 @@
+import errors ;
+
+# get url into location with vcs
+rule get ( vcs : location : url )
+{
+  if vcs == git
+  {
+    # @todo check results
+    # @todo don't check out anything for now
+    [ SHELL "git clone $(url) $(location)" ] ;
+
+  }
+  else if vcs == svn
+  {
+    # @todo check results
+    # @todo should checkout the trunk, but nothing in it, then switch?
+    [ SHELL "svn checkout $(url) $(location)" ] ;
+  }
+  else
+  {
+    errors.error "error: $(vcs) is unsupported." ;
+  }
+}
+
+rule checkout ( vcs : location : ref )
+{
+  if vcs == git
+  {
+    # @todo check errors, worry about -C, should it be detached?
+    [ SHELL "(cd $(location) && git checkout $(ref)" ] ;
+  }
+  else if vcs == svn
+  {
+    # check errors, etc.
+    [ SHELL "( cd $(location) && svn checkout $(ref) )" ] ;
+  }
+}

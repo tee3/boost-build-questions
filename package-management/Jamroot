@@ -1,0 +1,11 @@
+import bpm ;
+
+# will intall to $(bpm.root)/libtwtetl-0.26.2
+bpm.source-package libtwtetl : 0.26.2 : git : https://github.trellisware.com/software-team/libtwtetl ;
+
+# will install to $(bpm.root)/libtwtetl-ad3e3ed12344
+bpm.source-package libtwtetl : ad3e3ed12344 : git : https://github.trellisware.com/software-team/libtwtetl ;
+
+# will install to $(bpm.root)/libtwtet-0.10.0
+bpm.source-package libwtwetl : 0.10.0 : svn : https://svn.trellisware.com/twt/private/libraries/libtwtetl ;
+

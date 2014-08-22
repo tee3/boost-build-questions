@@ -1,0 +1,90 @@
+# a source package mananger
+
+# gets a source package and puts it at path and checks out ref
+#
+# all packages are checked out to the same place, by version number
+# creates a 'database' of packages installed from boost.build
+#
+# ROOT/name0-version-0
+# ROOT/name0-version-1
+# ROOT/name1
+# ROOT/name2-version-0
+
+import errors ;
+import path ;
+import vcs ;
+
+# allow the user to specify this
+path-constant root = /tmp/bpm ;
+
+# read .gitmodules or svn:externals or .bpmpackages
+
+rule detect-configuration ( location )
+{
+  local bpm-packages = ;
+
+  if [ path.exists $(location)/.bpmpackages ]
+  {
+    # parse .bpmpackages and set up source-packages
+  }
+  else if [ path.exists $(location)/.gitmodules ]
+  {
+    if $(vcs) == git
+    {
+      # parse .gitmodules
+    }
+    else if $(vcs) == svn
+    {
+      # parse
+    }
+    else
+    {
+      errors.error "error:bpm:$(vcs): unknown vcs" ;
+    }
+  }
+}
+
+rule source-package ( name : ref ? : vcs : url )
+{
+  if ! path.exists $(root)
+  {
+    [ path.makedirs $(root) ] ;
+  }
+
+  local location = $(root)/$(name)-$(ref) ;
+
+  # if it doesn't exist, get it somehow, then set it to ref
+  if ! [ path.exists $(location) ]
+  {
+    result = [ vcs.get $(vcs) $(location) $(url) ] ;
+
+    if ! result
+    {
+      errors.error "error:bpm:$(vcs): failed to get $(url)" ;
+    }
+
+    # @todo check for errors
+    [ vcs.checkout $(vcs) $(location) $(ref) ] ;
+  }
+  else
+  {
+    # if it exists, check that it's from the url and at ref, if not
+    # warn or error
+    current-url = [ vcs.url $(vcs) $(location) ] ;
+    current-ref = [ vcs.current_ref $(vcs) $(location) ] ;
+
+    if $(current-url) != $(url)
+    {
+      errors.error "error:bpm:$(vcs): $(location) is at $(current-url) not $(url)" ;
+    }
+    if $(current-ref) != "" || $(current-ref) != $(ref)
+    {
+      errors.error "error:bpm:$(vcs): $(location) at $(current-ref) not $(ref)" ;
+    }
+
+    if $(current-ref) == ""
+    {
+      [ vcs.checkout $(vcs) $(location) $(ref) ] ;
+    }
+  }
+}
