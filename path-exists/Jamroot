@@ -1,0 +1,24 @@
+# this all works, not sure what my problem is
+
+import path ;
+
+import assert ;
+
+assert.true path.exists . ;
+assert.true path.exists /tmp ;
+assert.true path.exists "/tmp" ;
+# @todo this fails, but shouldn't
+#assert.true path.exists /tmp/ ;
+assert.false path.exists okay-there-is-no-file ;
+assert.false path.exists /okay-there-is-no-file/dir1/dir2/dir3 ;
+assert.false path.exists /tmp2 ;
+
+if [ path.exists . ]
+{
+  echo "good" ;
+}
+
+if ! [ path.exists "/tmp2/a/b/c" ]
+{
+  echo "good" ;
+}
