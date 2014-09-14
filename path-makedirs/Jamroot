@@ -1,0 +1,6 @@
+import path ;
+
+path-constant root : ./tmp ;
+
+path.makedirs $(root)/a ;
+path.makedirs $(root)/b ;
