@@ -1,0 +1,37 @@
+import toolset ;
+import feature ;
+
+feature.feature <built_tool> : : dependency free ;
+
+explicit built_tool ;
+exe built_tool
+  :
+     built_tool.c
+  ;
+
+explicit cross ;
+exe cross
+  :
+    cross.c
+  ;
+
+make cross-final
+  :
+    cross/<toolset>gcc
+  :
+    @built_tool
+  :
+    <built_tool>.//built_tool
+  ;
+
+toolset.flags built_tool COMMAND <built_tool> ;
+
+rule built_tool ( targets * : source * : properties * )
+{
+  DEPENDS $(targets) : [ on $(targets) return $(COMMAND) ] ;
+}
+
+actions built_tool bind COMMAND
+{
+  $(COMMAND:E=built_tool) $(>) $(<)
+}
