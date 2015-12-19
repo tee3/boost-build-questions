@@ -6,19 +6,14 @@ often necessary to manipulate images for a target platform from the
 host platform and sometimes this requires a custom tool built on the
 host platform.
 
-This is emulated by building `built_tool` with one compiler and
-`cross` with another compiler.  Since this was tested on OS X, the
-`built_tool` is built with `clang` and the `cross` target is built
-with `darwin`.
-
-The results of running this project on OS X are shown below.  This
-still requires an update to use a `<platform>` feature to drive the
-requirements as in the original project, but this is a start on
-getting things going.
+This is emulated by building `built_tool` for
+`<platform>platform-host` and `cross` with for `<platform>platform-a`.
+`<platform>platform-host` has one requirement of `<toolset>clang` and
+`<platform>platform-a` has one requirement of `<toolset>darwin-4.2.1`.
 
 The `cross-final-c` target provides the correct results, though the
 version has to be explicitly stated in order for the directory for the
-`cross-final-c` target to be correct (darwin-4.2.1 like the `cross`
+`cross-final-c` target to be correct (`darwin-4.2.1` like the `cross`
 target).  Furthermore, it would be best not to put any requirements on
 the built tool other than it needs to run on the current host.
 
@@ -37,9 +32,17 @@ When building the `cross-final-b` target (which has a requirement on
 ## cross-final-c
 
 ```
-b2 cross-final-c -a -n
-...found 13 targets...
-...updating 9 targets...
+$ b2 cross-final-c -a -n
+...found 15 targets...
+...updating 11 targets...
+common.mkdir bin/debug
+
+        mkdir -p "bin/debug"
+
+common.mkdir bin/debug/platform-platform-a
+
+        mkdir -p "bin/debug/platform-platform-a"
+
 common.mkdir bin/darwin-4.2.1
 
         mkdir -p "bin/darwin-4.2.1"
@@ -48,55 +51,51 @@ common.mkdir bin/darwin-4.2.1/debug
 
         mkdir -p "bin/darwin-4.2.1/debug"
 
-darwin.compile.c bin/darwin-4.2.1/debug/cross.o
+common.mkdir bin/darwin-4.2.1/debug/platform-platform-a
 
-    "g++" -x c -O0 -fno-inline -Wall -g -dynamic -gdwarf-2 -fexceptions -fPIC     -c -o "bin/darwin-4.2.1/debug/cross.o" "cross.c"
+        mkdir -p "bin/darwin-4.2.1/debug/platform-platform-a"
 
-darwin.link bin/darwin-4.2.1/debug/cross
+darwin.compile.c bin/darwin-4.2.1/debug/platform-platform-a/cross.o
 
-    "g++"  -o "bin/darwin-4.2.1/debug/cross" "bin/darwin-4.2.1/debug/cross.o"       -g
+    "g++" -x c -O0 -fno-inline -Wall -g -dynamic -gdwarf-2 -fexceptions -fPIC     -c -o "bin/darwin-4.2.1/debug/platform-platform-a/cross.o" "cross.c"
+
+darwin.link bin/darwin-4.2.1/debug/platform-platform-a/cross
+
+    "g++"  -o "bin/darwin-4.2.1/debug/platform-platform-a/cross" "bin/darwin-4.2.1/debug/platform-platform-a/cross.o"       -g
 
 
-common.mkdir bin/clang-darwin-4.2.1
+common.mkdir bin/debug/platform-platform-host
 
-        mkdir -p "bin/clang-darwin-4.2.1"
+        mkdir -p "bin/debug/platform-platform-host"
 
-common.mkdir bin/clang-darwin-4.2.1/debug
+clang-darwin.compile.c bin/debug/platform-platform-host/built_tool.o
 
-        mkdir -p "bin/clang-darwin-4.2.1/debug"
+    "clang++" -x c -O0 -g -O0 -fno-inline -Wall -g   -c -o "bin/debug/platform-platform-host/built_tool.o" "built_tool.c"
 
-clang-darwin.compile.c bin/clang-darwin-4.2.1/debug/built_tool.o
+clang-darwin.link bin/debug/platform-platform-host/built_tool
 
-    "clang++" -x c -O0 -g -O0 -fno-inline -Wall -g   -c -o "bin/clang-darwin-4.2.1/debug/built_tool.o" "built_tool.c"
+    "clang++"   -o "bin/debug/platform-platform-host/built_tool" "bin/debug/platform-platform-host/built_tool.o"        -g
 
-clang-darwin.link bin/clang-darwin-4.2.1/debug/built_tool
+Jamfile</Users/tsc/Development/boost-build-questions/built-tool-cross>.built_tool bin/debug/platform-platform-a/cross-final-c
 
-    "clang++"   -o "bin/clang-darwin-4.2.1/debug/built_tool" "bin/clang-darwin-4.2.1/debug/built_tool.o"        -g
+  bin/debug/platform-platform-host/built_tool bin/darwin-4.2.1/debug/platform-platform-a/cross bin/debug/platform-platform-a/cross-final-c
 
-Jamfile</Users/tsc/Development/boost-build-questions/built-tool-cross>.built_tool bin/darwin-4.2.1/debug/cross-final-c
-
-  bin/clang-darwin-4.2.1/debug/built_tool bin/darwin-4.2.1/debug/cross bin/darwin-4.2.1/debug/cross-final-c
-
-...updated 9 targets...
+...updated 11 targets...
 ```
 
 ## cross-final-b
 
 ```
-b2 cross-final-b -a -n
-...found 13 targets...
+$ b2 cross-final-b -a -n
+...found 14 targets...
 ...updating 10 targets...
-common.mkdir bin
+common.mkdir bin/debug
 
-        mkdir -p "bin"
+        mkdir -p "bin/debug"
 
-common.mkdir bin/darwin
+common.mkdir bin/debug/platform-platform-a
 
-        mkdir -p "bin/darwin"
-
-common.mkdir bin/darwin/debug
-
-        mkdir -p "bin/darwin/debug"
+        mkdir -p "bin/debug/platform-platform-a"
 
 common.mkdir bin/darwin-4.2.1
 
@@ -106,27 +105,31 @@ common.mkdir bin/darwin-4.2.1/debug
 
         mkdir -p "bin/darwin-4.2.1/debug"
 
-darwin.compile.c bin/darwin-4.2.1/debug/cross.o
+common.mkdir bin/darwin-4.2.1/debug/platform-platform-a
 
-    "g++" -x c -O0 -fno-inline -Wall -g -dynamic -gdwarf-2 -fexceptions -fPIC     -c -o "bin/darwin-4.2.1/debug/cross.o" "cross.c"
+        mkdir -p "bin/darwin-4.2.1/debug/platform-platform-a"
 
-darwin.link bin/darwin-4.2.1/debug/cross
+darwin.compile.c bin/darwin-4.2.1/debug/platform-platform-a/cross.o
 
-    "g++"  -o "bin/darwin-4.2.1/debug/cross" "bin/darwin-4.2.1/debug/cross.o"       -g
+    "g++" -x c -O0 -fno-inline -Wall -g -dynamic -gdwarf-2 -fexceptions -fPIC     -c -o "bin/darwin-4.2.1/debug/platform-platform-a/cross.o" "cross.c"
 
+darwin.link bin/darwin-4.2.1/debug/platform-platform-a/cross
 
-darwin.compile.c bin/darwin-4.2.1/debug/built_tool.o
-
-    "g++" -x c -O0 -fno-inline -Wall -g -dynamic -gdwarf-2 -fexceptions -fPIC     -c -o "bin/darwin-4.2.1/debug/built_tool.o" "built_tool.c"
-
-darwin.link bin/darwin-4.2.1/debug/built_tool
-
-    "g++"  -o "bin/darwin-4.2.1/debug/built_tool" "bin/darwin-4.2.1/debug/built_tool.o"       -g
+    "g++"  -o "bin/darwin-4.2.1/debug/platform-platform-a/cross" "bin/darwin-4.2.1/debug/platform-platform-a/cross.o"       -g
 
 
-Jamfile</Users/tsc/Development/boost-build-questions/built-tool-cross>.built_tool bin/darwin/debug/cross-final-b
+darwin.compile.c bin/darwin-4.2.1/debug/platform-platform-a/built_tool.o
 
-  bin/darwin-4.2.1/debug/built_tool bin/darwin-4.2.1/debug/cross bin/darwin/debug/cross-final-b
+    "g++" -x c -O0 -fno-inline -Wall -g -dynamic -gdwarf-2 -fexceptions -fPIC     -c -o "bin/darwin-4.2.1/debug/platform-platform-a/built_tool.o" "built_tool.c"
+
+darwin.link bin/darwin-4.2.1/debug/platform-platform-a/built_tool
+
+    "g++"  -o "bin/darwin-4.2.1/debug/platform-platform-a/built_tool" "bin/darwin-4.2.1/debug/platform-platform-a/built_tool.o"       -g
+
+
+Jamfile</Users/tsc/Development/boost-build-questions/built-tool-cross>.built_tool bin/debug/platform-platform-a/cross-final-b
+
+  bin/darwin-4.2.1/debug/platform-platform-a/built_tool bin/darwin-4.2.1/debug/platform-platform-a/cross bin/debug/platform-platform-a/cross-final-b
 
 ...updated 10 targets...
 ```
@@ -134,9 +137,9 @@ Jamfile</Users/tsc/Development/boost-build-questions/built-tool-cross>.built_too
 ## cross-final-a
 
 ```
-b2 cross-final-a -a -n
-...found 13 targets...
-...updating 9 targets...
+$ b2 cross-final-a -a -n
+...found 14 targets...
+...updating 10 targets...
 common.mkdir bin/clang-darwin-4.2.1
 
         mkdir -p "bin/clang-darwin-4.2.1"
@@ -153,13 +156,17 @@ common.mkdir bin/darwin-4.2.1/debug
 
         mkdir -p "bin/darwin-4.2.1/debug"
 
-darwin.compile.c bin/darwin-4.2.1/debug/cross.o
+common.mkdir bin/darwin-4.2.1/debug/platform-platform-a
 
-    "g++" -x c -O0 -fno-inline -Wall -g -dynamic -gdwarf-2 -fexceptions -fPIC     -c -o "bin/darwin-4.2.1/debug/cross.o" "cross.c"
+        mkdir -p "bin/darwin-4.2.1/debug/platform-platform-a"
 
-darwin.link bin/darwin-4.2.1/debug/cross
+darwin.compile.c bin/darwin-4.2.1/debug/platform-platform-a/cross.o
 
-    "g++"  -o "bin/darwin-4.2.1/debug/cross" "bin/darwin-4.2.1/debug/cross.o"       -g
+    "g++" -x c -O0 -fno-inline -Wall -g -dynamic -gdwarf-2 -fexceptions -fPIC     -c -o "bin/darwin-4.2.1/debug/platform-platform-a/cross.o" "cross.c"
+
+darwin.link bin/darwin-4.2.1/debug/platform-platform-a/cross
+
+    "g++"  -o "bin/darwin-4.2.1/debug/platform-platform-a/cross" "bin/darwin-4.2.1/debug/platform-platform-a/cross.o"       -g
 
 
 clang-darwin.compile.c bin/clang-darwin-4.2.1/debug/built_tool.o
@@ -172,7 +179,7 @@ clang-darwin.link bin/clang-darwin-4.2.1/debug/built_tool
 
 Jamfile</Users/tsc/Development/boost-build-questions/built-tool-cross>.built_tool bin/clang-darwin-4.2.1/debug/cross-final-a
 
-  bin/clang-darwin-4.2.1/debug/built_tool bin/darwin-4.2.1/debug/cross bin/clang-darwin-4.2.1/debug/cross-final-a
+  bin/clang-darwin-4.2.1/debug/built_tool bin/darwin-4.2.1/debug/platform-platform-a/cross bin/clang-darwin-4.2.1/debug/cross-final-a
 
-...updated 9 targets...
+...updated 10 targets...
 ```

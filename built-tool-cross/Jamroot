@@ -1,6 +1,25 @@
 import toolset ;
 import feature ;
 
+feature.feature platform
+  :
+    platform-host
+    platform-a
+  :
+    composite
+    propagated
+    optional
+    symmetric
+  ;
+feature.compose <platform>platform-host
+  :
+    <toolset>clang
+  ;
+feature.compose <platform>platform-a
+  :
+    <toolset>darwin-4.2.1
+  ;
+
 # this results in the desired behavior.
 explicit cross final-c ;
 make cross-final-c
@@ -9,9 +28,9 @@ make cross-final-c
   :
     @built_tool
   :
-    <built_tool>.//built_tool/<toolset>clang
+    <built_tool>.//built_tool/<platform>platform-host
 
-    <toolset>darwin-4.2.1
+    <platform>platform-a
   ;
 
 # this results in the built tool being built with darwin
@@ -24,14 +43,14 @@ make cross-final-b
   :
     <built_tool>.//built_tool
 
-    <toolset>darwin-4.2.1
+    <platform>platform-a
   ;
 
 # this results in cross-final-a in the directory for the clang
 explicit cross-final-a ;
 make cross-final-a
   :
-    cross/<toolset>darwin-4.2.1
+    cross/<platform>platform-a
   :
     @built_tool
   :
