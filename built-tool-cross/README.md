@@ -9,30 +9,38 @@ host platform.
 This is emulated by building `built_tool` with one compiler and
 `cross` with another compiler.  Since this was tested on OS X, the
 `built_tool` is built with `clang` and the `cross` target is built
-with `gcc`.
+with `darwin`.
 
 The project as defined does not work as expected.  The results of
 running this project on OS X are below.
 
-The issues are:
-
-1. The compiler command is empty when building the `cross` target.
-
-2. The use of `built_tool` is correct except that it was expected that
-   the `cross-final` target should be generated into the same
-   directory as the `cross` target.
+The issue is that the `cross-final` target (which is intended to be
+used on the target platform) is generated into
+`bin/clang-darwin-4.2.1/debug/cross-final`, which is the host
+location, instead of the location of the of the `cross` target
+`bin/darwin-4.2.1/debug/cross`.  This is a little confusing due to the
+naming of the `darwin` and `clang` toolsets on OS X.
 
 ```
 b2 -a -n
 ...found 13 targets...
-...updating 5 targets...
-gcc.compile.c bin/gcc/debug/cross.o
+...updating 7 targets...
+common.mkdir bin/darwin-4.2.1
 
-     -x c -O0 -fno-inline -Wall -g -fPIC     -c -o "bin/gcc/debug/cross.o" "cross.c"
+        mkdir -p "bin/darwin-4.2.1"
 
-gcc.link bin/gcc/debug/cross
+common.mkdir bin/darwin-4.2.1/debug
 
-        -o "bin/gcc/debug/cross"  "bin/gcc/debug/cross.o"       -g 
+        mkdir -p "bin/darwin-4.2.1/debug"
+
+darwin.compile.c bin/darwin-4.2.1/debug/cross.o
+
+    "g++" -x c -O0 -fno-inline -Wall -g -dynamic -gdwarf-2 -fexceptions -fPIC     -c -o "bin/darwin-4.2.1/debug/cross.o" "cross.c"
+
+darwin.link bin/darwin-4.2.1/debug/cross
+
+    "g++"  -o "bin/darwin-4.2.1/debug/cross" "bin/darwin-4.2.1/debug/cross.o"       -g
+
 
 clang-darwin.compile.c bin/clang-darwin-4.2.1/debug/built_tool.o
 
@@ -44,7 +52,7 @@ clang-darwin.link bin/clang-darwin-4.2.1/debug/built_tool
 
 Jamfile</Users/tsc/Development/boost-build-questions/built-tool-cross>.built_tool bin/clang-darwin-4.2.1/debug/cross-final
 
-  bin/clang-darwin-4.2.1/debug/built_tool bin/gcc/debug/cross bin/clang-darwin-4.2.1/debug/cross-final
+  bin/clang-darwin-4.2.1/debug/built_tool bin/darwin-4.2.1/debug/cross bin/clang-darwin-4.2.1/debug/cross-final
 
-...updated 5 targets...
+...updated 7 targets...
 ```

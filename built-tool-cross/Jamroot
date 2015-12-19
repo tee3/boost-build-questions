@@ -17,7 +17,7 @@ exe cross
 
 make cross-final
   :
-    cross/<toolset>gcc
+    cross/<toolset>darwin
   :
     @built_tool
   :
