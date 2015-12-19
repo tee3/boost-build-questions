@@ -1,20 +1,6 @@
 import toolset ;
 import feature ;
 
-feature.feature <built_tool> : : dependency free ;
-
-explicit built_tool ;
-exe built_tool
-  :
-     built_tool.c
-  ;
-
-explicit cross ;
-exe cross
-  :
-    cross.c
-  ;
-
 # this results in the desired behavior.
 explicit cross final-c ;
 make cross-final-c
@@ -51,6 +37,23 @@ make cross-final-a
   :
     <built_tool>.//built_tool
   ;
+
+# The definition of this built tool.
+explicit built_tool ;
+exe built_tool
+  :
+     built_tool.c
+  ;
+
+# The definition of the cross-compiled system.
+explicit cross ;
+exe cross
+  :
+    cross.c
+  ;
+
+# The built_tool feature
+feature.feature <built_tool> : : dependency free ;
 
 toolset.flags built_tool COMMAND <built_tool> ;
 
