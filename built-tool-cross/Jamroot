@@ -15,9 +15,37 @@ exe cross
     cross.c
   ;
 
-make cross-final
+# this results in the desired behavior.
+explicit cross final-c ;
+make cross-final-c
   :
-    cross/<toolset>darwin
+    cross
+  :
+    @built_tool
+  :
+    <built_tool>.//built_tool/<toolset>clang
+
+    <toolset>darwin-4.2.1
+  ;
+
+# this results in the built tool being built with darwin
+explicit cross-final-b ;
+make cross-final-b
+  :
+    cross
+  :
+    @built_tool
+  :
+    <built_tool>.//built_tool
+
+    <toolset>darwin-4.2.1
+  ;
+
+# this results in cross-final-a in the directory for the clang
+explicit cross-final-a ;
+make cross-final-a
+  :
+    cross/<toolset>darwin-4.2.1
   :
     @built_tool
   :
