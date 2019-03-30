@@ -1,0 +1,36 @@
+
+This device has several processors available on it and the tool is
+configured to build the BSP for a particular processor.  There are
+many families of devices with many different processors (different
+architectures, etc).  The device is also configurable, so building the
+BSP depends on those configurable properties as well.  This is all
+specified in a device configuration file created by the tool as well
+as additional properties defined as features by the build system.
+
+I am trying to use Boost.Build features to control this process and
+I'm just about there.
+
+One issue that I'm struggling with is the fact that the toolset
+depends on both the hardware device (which drives which processors are
+available at all) and the processor chosen.  Is it possible to change
+the toolset during the run rule of a generator?
+
+In the past when I've done things like this, I would just add the
+toolset, architecture, and instruction-set to the usage-requirements
+of a target within the project's build system.  This works fine, but
+puts the decision at the time of writing the project build system and
+not at build time.  To deal with that, I would typically add a
+"platform" feature to define the instruction-set and other
+platform-specific information.
+
+I'm trying to do the same sort of thing with this module, but having
+the BSP drive all that information.  This is working well for
+everything but the toolset.  For example. I can return the
+usage-requirements by returning a property-set from the run rule of
+the generator changing the architecture and instruction-set, but
+adding the toolset in the usage-requirements results in the default
+toolset being run and the path including both the default toolset and
+the toolset I returned in the usage-requirements.
+
+I haven't yet put together a minimal example of this, but I will if
+necessary.  My guess is that the toolset is special in some way.

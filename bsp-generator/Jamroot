@@ -1,0 +1,2 @@
+alias x : : : : <toolset>darwin-8 ;
+exe hello : hello.cpp x ;
