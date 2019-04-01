@@ -1,0 +1,44 @@
+import generators ;
+import type ;
+import "class" ;
+
+import assert ;
+
+type.register FFF : fff ;
+type.register G : g ;
+
+class g-generator : generator
+{
+  rule __init__ ( id composing ? : source-types + : target-types-and-names + : requirements * )
+  {
+    generator.__init__ $(id) $(composing) : $(source-types) : $(target-types-and-names) : $(requirements) ;
+  }
+
+  rule run ( project name ? : property-set : sources * )
+  {
+    # @todo comment this out to work
+    assert.true true ;
+
+    return [ generator.run $(project) $(name) : $(property-set) : $(sources) ] ;
+  }
+
+  rule generated-targets ( sources + : property-set : project name ? )
+  {
+    if ! $(name)
+    {
+      name = [ generator.determine-output-name $(sources) ] ;
+    }
+
+    local a = [ class.new action $(sources) : g.g-generator : $(property-set) ] ;
+    local t = [ class.new file-target $(name) : G : $(project) : $(a) ] ;
+
+    return [ virtual-target.register $(t) ] ;
+  }
+}
+
+generators.register [ class.new g-generator g.g-generator : FFF : G ] ;
+
+actions g-generator
+{
+  echo "g-generator \"$(<)\" \"$(>)\""
+}
