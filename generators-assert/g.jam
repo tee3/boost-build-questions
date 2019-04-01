@@ -9,6 +9,9 @@ type.register G : g ;
 
 class g-generator : generator
 {
+  import assert ;
+  import errors ;
+
   rule __init__ ( id composing ? : source-types + : target-types-and-names + : requirements * )
   {
     generator.__init__ $(id) $(composing) : $(source-types) : $(target-types-and-names) : $(requirements) ;
@@ -16,8 +19,8 @@ class g-generator : generator
 
   rule run ( project name ? : property-set : sources * )
   {
-    # @todo comment this out to work
     assert.equal a : a ;
+    errors.user-error "hello" ;
 
     return [ generator.run $(project) $(name) : $(property-set) : $(sources) ] ;
   }
@@ -37,6 +40,11 @@ class g-generator : generator
 }
 
 generators.register [ class.new g-generator g.g-generator : FFF : G ] ;
+
+rule g-generator ( targets + : sources + : properties * )
+{
+  assert.equal a : a ;
+}
 
 actions g-generator
 {
