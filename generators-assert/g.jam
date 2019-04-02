@@ -17,7 +17,7 @@ class g-generator : generator
   rule run ( project name ? : property-set : sources * )
   {
     # @todo comment this out to work
-    assert.true true ;
+    assert.equal a : a ;
 
     return [ generator.run $(project) $(name) : $(property-set) : $(sources) ] ;
   }
