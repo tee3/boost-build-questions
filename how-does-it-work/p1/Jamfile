@@ -1,0 +1,1 @@
+exe main : main.cpp ../p0//a : <variant>release <instruction-set>armv7 ;
