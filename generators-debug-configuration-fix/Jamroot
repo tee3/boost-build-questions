@@ -1,0 +1,2 @@
+lib libhello : libhello.c : <include>XXX ;
+exe hello : hello.c libhello ;
