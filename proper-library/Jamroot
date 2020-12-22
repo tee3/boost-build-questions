@@ -1,0 +1,5 @@
+import testing ;
+
+build-project l0 ;
+build-project l1 ;
+build-project p ;
